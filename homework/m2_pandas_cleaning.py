@@ -20,7 +20,9 @@ def green_read_csv():
     提示：pd.read_csv()
     """
     # TODO: 你的程式碼
-    pass
+    ras = pd.read_csv('datasets/ecommerce/orders_raw.csv')
+    
+    return ras
 
 
 def green_shape(df):
@@ -29,7 +31,7 @@ def green_shape(df):
     提示：df.shape
     """
     # TODO: 你的程式碼
-    pass
+    return df.shape
 
 
 def green_dtypes(df):
@@ -38,7 +40,7 @@ def green_dtypes(df):
     提示：df.dtypes
     """
     # TODO: 你的程式碼
-    pass
+    return df.dtypes
 
 
 # ============================================================
@@ -52,7 +54,9 @@ def yellow_clean_columns(df):
     提示：df.columns.str.strip().str.lower()
     """
     # TODO: 你的程式碼
-    pass
+    new_df = df.copy()
+    new_df.columns = new_df.columns.str.strip().str.lower()
+    return new_df
 
 
 def yellow_clean_amount(df):
@@ -63,7 +67,11 @@ def yellow_clean_amount(df):
     提示：.str.replace() + .astype(float)
     """
     # TODO: 你的程式碼
-    pass
+    new_df = df.copy()
+    new_df['amount'] = new_df['amount'].astype(str).str.replace('$', '', regex=False)
+    new_df['amount'] = new_df['amount'].astype(str).str.replace(',', '', regex=False).astype(float)
+
+    return new_df
 
 
 def yellow_drop_duplicates(df):
@@ -72,7 +80,10 @@ def yellow_drop_duplicates(df):
     提示：df.drop_duplicates()
     """
     # TODO: 你的程式碼
-    pass
+    new_df = df.copy()
+    new_df = new_df.drop_duplicates()
+    
+    return new_df
 
 
 # ============================================================
@@ -93,4 +104,13 @@ def red_clean_orders(path):
     提示：pd.to_datetime(errors='coerce')
     """
     # TODO: 你的程式碼
-    pass
+    df = pd.read_csv(path)
+    new_df = df.copy()
+    new_df.columns = new_df.columns.str.strip().str.lower()
+    new_df['amount'] = new_df['amount'].astype(str).str.replace('$','',regex=False)
+    new_df['amount'] = new_df['amount'].astype(str).str.replace(',','',regex=False).astype(float)
+    new_df['order_date'] = pd.to_datetime(new_df['order_date'],errors='coerce')
+    new_df = new_df.dropna(subset= ['order_date'])
+    new_df = new_df.dropna(subset= ['amount'])
+    new_df = new_df.drop_duplicates()
+    return new_df
