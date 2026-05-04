@@ -24,19 +24,28 @@ def green_load_and_merge():
     提示：pd.merge(how='left')
     """
     # TODO: 你的程式碼
-    pass
+    orders =pd.read_csv('../datasets/ecommerce/orders_clean.csv',parse_dates=['order_date'])
+    customers =pd.read_csv('../datasets/ecommerce/customers.csv')
+    products =pd.read_csv('../datasets/ecommerce/products.csv')
+
+    full = (
+        orders
+        .merge(customers, on= 'customer_id', how= 'left')
+        .merge(products, on='product_id',how='left')
+    )
+    return full
 
 
 def green_row_count(df):
     """回傳 DataFrame 的列數 (int)"""
     # TODO: 你的程式碼
-    pass
+    return len(df)
 
 
 def green_column_list(df):
     """回傳 DataFrame 的所有欄位名稱 (list)"""
     # TODO: 你的程式碼
-    pass
+    return list(df.columns)
 
 
 # ============================================================
@@ -50,7 +59,9 @@ def yellow_top_category(df):
     提示：groupby('category')['amount'].sum()
     """
     # TODO: 你的程式碼
-    pass
+    category_amount = df.groupby('category')['amount'].sum()
+    best_category_amount =category_amount.idxmax()
+    return best_category_amount
 
 
 def yellow_gold_vip_stats(df):
@@ -60,7 +71,11 @@ def yellow_gold_vip_stats(df):
     提示：df[df['vip_level'] == 'Gold']
     """
     # TODO: 你的程式碼
-    pass
+    gold_vip = df[df['vip_level'] == 'Gold']
+    order_count = len(gold_vip)
+    total_amount = gold_vip['amount'].sum
+
+    return(order_count, total_amount)
 
 
 def yellow_region_avg_amount(df):
@@ -70,7 +85,8 @@ def yellow_region_avg_amount(df):
     提示：groupby('region')['amount'].mean()
     """
     # TODO: 你的程式碼
-    pass
+    region_mean = df.groupby('region')['amount'].mean()
+    return region_mean
 
 
 # ============================================================
@@ -94,4 +110,11 @@ def red_rfm_top5(df):
     提示：groupby('customer_id').agg(...)
     """
     # TODO: 你的程式碼
-    pass
+    rfm = df.groupby('customer_id').agg(customer_name=('customer_name','first'),
+                                       R = ('order_date','max'),
+                                       F = ('order_id','count'),
+                                       M = ('amount','sum'))
+    rfm = rfm.sort_values('M',ascending=False)
+    rfm = rfm.reset_index()
+    top5 = rfm.head()
+    return top5

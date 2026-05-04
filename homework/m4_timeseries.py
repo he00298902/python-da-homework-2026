@@ -27,8 +27,13 @@ def green_avg_by_month():
     提示：df['order_date'].dt.month
     """
     # TODO: 你的程式碼
-    pass
-
+    df = _load_data()
+    df['year'] = df['order_date'].dt.year
+    df['month']= df['order_date'].dt.month
+    df['weekday'] = df['order_date'].dt.day_name()
+    df['year_month'] = df['order_date'].dt.to_period('M')
+    month_avg_amount = df.groupby('month')['amount'].mean()
+    return month_avg_amount
 
 def green_top3_dates():
     """
@@ -37,7 +42,9 @@ def green_top3_dates():
     提示：value_counts().head(3)
     """
     # TODO: 你的程式碼
-    pass
+    df = _load_data()
+    top3_dates = df['order_date'].value_counts().head(3)
+    return top3_dates
 
 
 def green_date_range():
@@ -46,7 +53,8 @@ def green_date_range():
     格式為 pandas Timestamp
     """
     # TODO: 你的程式碼
-    pass
+    df = _load_data()
+    return (df['order_date'].min() ,df['order_date'].max())
 
 
 # ============================================================
@@ -60,10 +68,15 @@ def yellow_monthly_revenue():
     提示：set_index('order_date').resample('ME')['amount'].sum()
     """
     # TODO: 你的程式碼
-    pass
+    df = _load_data()
+    ts = df.set_index('order_date')
+    month_sum_amount = ts.resample('ME')['amount'].sum()
+
+    return month_sum_amount
 
 
 def yellow_rolling_avg(monthly_revenue):
+
     """
     計算 3 個月移動平均
     接收 yellow_monthly_revenue() 的結果作為輸入
@@ -71,8 +84,7 @@ def yellow_rolling_avg(monthly_revenue):
     提示：.rolling(window=3).mean()
     """
     # TODO: 你的程式碼
-    pass
-
+    return monthly_revenue.rolling(window=3).mean()
 
 def yellow_category_median(df):
     """
@@ -81,7 +93,9 @@ def yellow_category_median(df):
     提示：groupby + median + sort_values
     """
     # TODO: 你的程式碼
-    pass
+    category_order_median = df.groupby('category')['amount'].median()
+    category_order_median = category_order_median.sort_values(ascending =False)
+    return category_order_median
 
 
 # ============================================================
@@ -101,4 +115,13 @@ def red_monthly_report():
     提示：resample + agg + pct_change
     """
     # TODO: 你的程式碼
-    pass
+    df = _load_data()
+    ts = df.set_index('order_date')
+    report = ts.resample('ME').agg(
+        order_count=('order_id', 'count'),
+        revenue=('amount', 'sum'),
+        active_customers=('customer_id', 'nunique'),
+    )
+    report['avg_order_value'] = (report['revenue'] / report['order_count']).round(2)
+    report['revenue_growth'] = (report['revenue'].pct_change()*100.).round(2)
+    return report
